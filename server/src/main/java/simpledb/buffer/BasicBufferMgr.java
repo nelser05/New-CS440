@@ -153,20 +153,36 @@ class BasicBufferMgr {
     * @return 
     */
    private Buffer useFIFOStrategy() {
-      throw new UnsupportedOperationException();
+      /**throw new UnsupportedOperationException();
+       */
+      for (Buffer buff : bufferpool)
+          if (!buff.isPinned())
+          return buff;
+      return null;
    }
    /**
     * LRU buffer selection strategy
     * @return 
     */
    private Buffer useLRUStrategy() {
-      throw new UnsupportedOperationException();
+      /*throw new UnsupportedOperationException();
+       */
+      for (Buffer buff : bufferpool)
+          if (!buff.isPinned())
+          return buff;
+      return null;
+      
    }
    /**
     * Clock buffer selection strategy
     * @return 
     */
    private Buffer useClockStrategy() {
-      throw new UnsupportedOperationException();
+      /*throw new UnsupportedOperationException();
+       */
+      for (Buffer buff : bufferpool)
+          if (!buff.isPinned())
+          return buff;
+      return null;
    }
 }
