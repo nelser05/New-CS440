@@ -1,5 +1,8 @@
 package simpledb.buffer;
-
+// Incorporate these imports to keep track of buffers in replacement
+import java.time.Instant;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import simpledb.file.*;
 
 /**
@@ -153,24 +156,36 @@ class BasicBufferMgr {
     * @return 
     */
    private Buffer useFIFOStrategy() {
-      /**throw new UnsupportedOperationException();
-       */
-      for (Buffer buff : bufferpool)
-          if (!buff.isPinned())
-          return buff;
-      return null;
+      //throw new UnsupportedOperationException();
+      SortedMap<Instant,Buffer> bufferMap;
+      bufferMap = new TreeMap();
+      Buffer useBuff = null;
+      
+      for (Buffer buff : bufferpool) {
+        bufferMap.put(buff.getTimeStamp(), buff);
+      }
+      useBuff = bufferMap.get(bufferMap.firstKey());
+      return useBuff;
    }
    /**
     * LRU buffer selection strategy
     * @return 
     */
+   
+   // NOTE: This strategy is very similar in implementation to FIFO, but
+   // Uses 'buff.getTimeUnpinned()' method instead
    private Buffer useLRUStrategy() {
-      /*throw new UnsupportedOperationException();
-       */
-      for (Buffer buff : bufferpool)
-          if (!buff.isPinned())
-          return buff;
-      return null;
+      //throw new UnsupportedOperationException();
+      SortedMap<Instant,Buffer> bufferMap;
+      bufferMap = new TreeMap();
+      Buffer useBuff = null;
+      
+      
+      for (Buffer buff : bufferpool) {
+        bufferMap.put(buff.getTimeUnpinned(), buff);
+      }
+      useBuff = bufferMap.get(bufferMap.firstKey());
+      return useBuff;
       
    }
    /**
@@ -178,11 +193,19 @@ class BasicBufferMgr {
     * @return 
     */
    private Buffer useClockStrategy() {
-      /*throw new UnsupportedOperationException();
-       */
+      //throw new UnsupportedOperationException();
+      
+      // Clock is similar to Naive, but uses a pointer to keep track of place
+      // Also similar to LRU; will skip recently used
+      int pointer = 0;
+      
       for (Buffer buff : bufferpool)
           if (!buff.isPinned())
-          return buff;
+            // pointer should move with loop. next iteration will start at pointer
+            
+            return buff;
       return null;
+      
+      
    }
 }

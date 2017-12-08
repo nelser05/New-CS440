@@ -1,5 +1,10 @@
 package simpledb.tx;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simpledb.server.SimpleDB;
 import simpledb.file.Block;
 import simpledb.buffer.*;
@@ -12,6 +17,7 @@ import simpledb.tx.concurrency.ConcurrencyMgr;
  * and in general satisfy the ACID properties.
  * @author Edward Sciore
  */
+
 public class Transaction {
    private static int nextTxNum = 0;
    private static final int END_OF_FILE = -1;
@@ -19,7 +25,9 @@ public class Transaction {
    private ConcurrencyMgr concurMgr;
    private int txnum;
    private BufferList myBuffers = new BufferList();
-   
+   private static Object lock = new Object();
+   private static List currentTransactionsList = Collections.synchronizedList(new ArrayList());
+   private long MAXTIME;
    /**
     * Creates a new transaction and its associated 
     * recovery and concurrency managers.
@@ -36,6 +44,17 @@ public class Transaction {
       txnum       = nextTxNumber();
       recoveryMgr = new RecoveryMgr(txnum);
       concurMgr   = new ConcurrencyMgr();
+      currentTransactionsList.add(this);
+      try {
+        lock.wait();
+        Thread.sleep(1000);
+        if (currentTransactionsList.size() == 10) {
+            CheckpointThread.inProgress = true;
+            new Thread(new CheckpointThread().start());
+       }
+     } catch (InterruptedException ex) {
+       Logger.getLogger(Transaction.class.getName()).log(Level.SEVERE, null, ex);
+       }
    }
    
    /**
@@ -62,6 +81,7 @@ public class Transaction {
       recoveryMgr.rollback();
       concurMgr.release();
       myBuffers.unpinAll();
+      currentTransactionsList.remove(currentTransactionsList.size()-1);
       System.out.println("transaction " + txnum + " rolled back");
    }
    
@@ -203,4 +223,14 @@ public class Transaction {
       System.out.println("new transaction: " + nextTxNum);
       return nextTxNum;
    }
+    private boolean waitingTooLong(long startTime) {
+        return System.currentTimeMillis() - startTime > MAXTIME;
+   }
+    public static Object getLock() {
+        return lock;
+   }
+    public static List getCurrentTransactionsList() {
+        return currentTransactionsList;
+   }
 }
+
