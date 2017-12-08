@@ -49,7 +49,7 @@ public class Transaction {
         lock.wait();
         Thread.sleep(1000);
         if (currentTransactionsList.size() == 10) {
-            // I get errors here and I don't know why
+            // I get errors in these 2 lines and I don't know why
             //CheckpointThread.inProgress = true;
             //new Thread(new CheckpointThread().start());
        }
