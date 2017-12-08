@@ -49,8 +49,9 @@ public class Transaction {
         lock.wait();
         Thread.sleep(1000);
         if (currentTransactionsList.size() == 10) {
-            CheckpointThread.inProgress = true;
-            new Thread(new CheckpointThread().start());
+            // I get errors here and I don't know why
+            //CheckpointThread.inProgress = true;
+            //new Thread(new CheckpointThread().start());
        }
      } catch (InterruptedException ex) {
        Logger.getLogger(Transaction.class.getName()).log(Level.SEVERE, null, ex);

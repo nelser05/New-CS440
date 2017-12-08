@@ -34,7 +34,9 @@ public class CheckpointThread implements Runnable {
       synchronized (Transaction.getLock()){
         try {
         checkpointLock.wait();
+        // Not sure why I get an error here either, but it's part of the algorithm
         //BufferMgr.flushAll();
+
         
       } catch (InterruptedException ex) {
           Logger.getLogger(CheckpointThread.class.getName()).log(Level.SEVERE, null, ex);
